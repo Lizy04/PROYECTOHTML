@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listar Datos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #ffe6f2;
+        }
+        .container {
+            max-width: 900px;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h3 {
+            color: #cc0099;
+        }
+        table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f7c6f7;
+        }
+        .btn {
+            background-color: #cc66cc;
+            border: none;
+        }
+        .btn:hover {
+            background-color: #b347b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Listar Datos</h1>
+
+        <h3>Categorías</h3>
+        <table id="tablaCategorias">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        
+        <h3>Sucursales</h3>
+        <table id="tablaSucursales">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Dirección</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <h3>Productos</h3>
+        <table id="tablaProductos">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Sucursal</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <div class="text-center mt-4">
+            <a href="registrar.html" class="btn text-white">Ir a Registrar</a>
+        </div>
+    </div>
+
+    <script>
+      
+        function eliminarElemento(tipo, id) {
+            let datos = JSON.parse(localStorage.getItem(tipo)) || [];
+            datos = datos.filter(item => item.categoriaid !== id && item.sucursalid !== id && item.productoId !== id); // Filtramos el ID a eliminar
+            localStorage.setItem(tipo, JSON.stringify(datos));
+            cargarDatos(); 
+        }
+
+
+        function cargarDatos() {
+            const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
+            const sucursales = JSON.parse(localStorage.getItem("sucursales")) || [];
+            const productos = JSON.parse(localStorage.getItem("productos")) || [];
+
+            const tablaCategorias = document.getElementById("tablaCategorias").querySelector("tbody");
+            const tablaSucursales = document.getElementById("tablaSucursales").querySelector("tbody");
+            const tablaProductos = document.getElementById("tablaProductos").querySelector("tbody");
+
+            tablaCategorias.innerHTML = "";
+            categorias.forEach(cat => {
+                const fila = `<tr>
+                    <td>${cat.categoriaid}</td>
+                    <td>${cat.nombre}</td>
+                    <td>${cat.descripcion}</td>
+                    <td><button class="btn text-white" onclick="eliminarElemento('categorias', ${cat.categoriaid})">Eliminar</button></td>
+                </tr>`;
+                tablaCategorias.innerHTML += fila;
+            });
+
+            tablaSucursales.innerHTML = "";
+            sucursales.forEach(suc => {
+                const fila = `<tr>
+                    <td>${suc.sucursalid}</td>
+                    <td>${suc.nombre}</td>
+                    <td>${suc.direccion}</td>
+                    <td><button class="btn text-white" onclick="eliminarElemento('sucursales', ${suc.sucursalid})">Eliminar</button></td>
+                </tr>`;
+                tablaSucursales.innerHTML += fila;
+            });
+
+            tablaProductos.innerHTML = "";
+            productos.forEach(prod => {
+                const categoria = categorias.find(c => c.categoriaid == prod.categoriaId);
+                const sucursal = sucursales.find(s => s.sucursalid == prod.sucursalid);
+                const fila = `<tr>
+                    <td>${prod.productoId}</td>
+                    <td>${prod.nombre}</td>
+                    <td>${categoria ? categoria.nombre : "Sin categoría"}</td>
+                    <td>$${prod.precio}</td>
+                    <td>${sucursal ? sucursal.nombre : "Sin sucursal"}</td>
+                    <td><button class="btn text-white" onclick="eliminarElemento('productos', ${prod.productoId})">Eliminar</button></td>
+                </tr>`;
+                tablaProductos.innerHTML += fila;
+            });
+        }
+
+        cargarDatos();
+    </script>
+</body>
+</html>

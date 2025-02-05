@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Datos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #ffe6f2;
+        }
+        .container {
+            max-width: 700px;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h3 {
+            color: #cc0099;
+        }
+        .btn {
+            background-color: #cc66cc;
+            border: none;
+        }
+        .btn:hover {
+            background-color: #b347b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Registrar Datos</h1>
+
+        <h3>Categorías</h3>
+        <form id="formCategoria">
+            <input type="number" id="categoriaId" class="form-control mb-2" placeholder="ID de la Categoría" required>
+            <input type="text" id="categoriaNombre" class="form-control mb-2" placeholder="Nombre de la Categoría" required>
+            <input type="text" id="categoriaDescripcion" class="form-control mb-2" placeholder="Descripción" required>
+            <button type="submit" class="btn text-white w-100">Agregar Categoría</button>
+        </form>
+
+        <h3>Sucursales</h3>
+        <form id="formSucursal">
+            <input type="number" id="sucursalId" class="form-control mb-2" placeholder="ID de la Sucursal" required>
+            <input type="text" id="sucursalNombre" class="form-control mb-2" placeholder="Nombre de la Sucursal" required>
+            <input type="text" id="sucursalDireccion" class="form-control mb-2" placeholder="Dirección" required>
+            <button type="submit" class="btn text-white w-100">Agregar Sucursal</button>
+        </form>
+
+        <h3>Productos</h3>
+        <form id="formProducto">
+            <input type="number" id="productoId" class="form-control mb-2" placeholder="ID del Producto" required>
+            <input type="text" id="productoNombre" class="form-control mb-2" placeholder="Nombre del Producto" required>
+            <select id="productoCategoria" class="form-control mb-2" required>
+                <option value="">Seleccionar Categoría</option>
+            </select>
+            <input type="number" id="productoPrecio" class="form-control mb-2" placeholder="Precio" step="0.01" required>
+            <select id="productoSucursal" class="form-control mb-2" required>
+                <option value="">Seleccionar Sucursal</option>
+            </select>
+            <button type="submit" class="btn text-white w-100">Agregar Producto</button>
+        </form>
+
+        <div class="text-center mt-4">
+            <a href="listar.html" class="btn text-white">Ir a Listar</a>
+        </div>
+    </div>
+
+    <script>
+        function guardarEnLocalStorage(clave, valor) {
+            const datos = JSON.parse(localStorage.getItem(clave)) || [];
+            datos.push(valor);
+            localStorage.setItem(clave, JSON.stringify(datos));
+        }
+
+        function actualizarOpciones() {
+            const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
+            const sucursales = JSON.parse(localStorage.getItem("sucursales")) || [];
+            const categoriaSelect = document.getElementById("productoCategoria");
+            const sucursalSelect = document.getElementById("productoSucursal");
+
+            categoriaSelect.innerHTML = '<option value="">Seleccionar Categoría</option>';
+            sucursalSelect.innerHTML = '<option value="">Seleccionar Sucursal</option>';
+
+            categorias.forEach(cat => {
+                const option = document.createElement("option");
+                option.value = cat.categoriaid;
+                option.textContent = `${cat.categoriaid} - ${cat.nombre}`;
+                categoriaSelect.appendChild(option);
+            });
+
+            sucursales.forEach(suc => {
+                const option = document.createElement("option");
+                option.value = suc.sucursalid;
+                option.textContent = `${suc.sucursalid} - ${suc.nombre}`;
+                sucursalSelect.appendChild(option);
+            });
+        }
+
+        document.getElementById("formCategoria").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const id = document.getElementById("categoriaId").value;
+            const nombre = document.getElementById("categoriaNombre").value;
+            const descripcion = document.getElementById("categoriaDescripcion").value;
+            guardarEnLocalStorage("categorias", { categoriaid: id, nombre, descripcion });
+            e.target.reset();
+            actualizarOpciones();
+            alert("Categoría registrada.");
+        });
+
+        document.getElementById("formSucursal").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const id = document.getElementById("sucursalId").value;
+            const nombre = document.getElementById("sucursalNombre").value;
+            const direccion = document.getElementById("sucursalDireccion").value;
+            guardarEnLocalStorage("sucursales", { sucursalid: id, nombre, direccion });
+            e.target.reset();
+            actualizarOpciones();
+            alert("Sucursal registrada.");
+        });
+
+        document.getElementById("formProducto").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const id = document.getElementById("productoId").value;
+            const nombre = document.getElementById("productoNombre").value;
+            const categoriaId = document.getElementById("productoCategoria").value;
+            const precio = document.getElementById("productoPrecio").value;
+            const sucursalid = document.getElementById("productoSucursal").value;
+
+            if (!categoriaId || !sucursalid) {
+                alert("Debes seleccionar una categoría y una sucursal.");
+                return;
+            }
+
+            guardarEnLocalStorage("productos", { productoId: id, nombre, categoriaId, precio, sucursalid });
+            e.target.reset();
+            alert("Producto registrado.");
+        });
+
+        actualizarOpciones();
+    </script>
+</body>
+</html>
